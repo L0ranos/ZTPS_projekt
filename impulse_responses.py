@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.fft import fft, fftfreq, rfft
 from scipy.signal.windows import tukey
-from scipy.signal import butter, lfilter
+from scipy.signal import butter, lfilter, unit_impulse
 import matplotlib.pyplot as plt
 import sounddevice as sd
 from time import sleep
@@ -11,11 +11,11 @@ from matplotlib.patches import Rectangle
 
 def make_room_impulse_responses():
     fs = 5000
-    imp_length = 0.8 # w sekundach
+    imp_length = 1 # w sekundach
 
     test_signal = np.random.random(int(fs*imp_length))-0.5
 
-    b, a = butter(5, [1200, 1300], fs=fs, btype='band')
+    b, a = butter(5, [1200, 1250], fs=fs, btype='band')
     test_signal = lfilter(b, a, test_signal)
 
     test_window = tukey(int(fs*imp_length))
@@ -63,10 +63,9 @@ def make_room_impulse_responses():
 
 
     test_room = pra.ShoeBox(
-    room_dimensions, fs=fs, materials=pra.Material(0.1), max_order=3)
+    room_dimensions, fs=fs, materials=pra.Material(0.1), max_order=1)
     test_room.add_source(src_position, signal=test_signal)
     test_room.add_microphone_array(mic_locs)
-    test_room.set_ray_tracing(receiver_radius=0.05, n_rays=10000, energy_thres=1e-5)
     test_room.compute_rir()
     test_room.simulate()
 
@@ -89,6 +88,6 @@ def make_room_impulse_responses():
     plt.grid(True, "both")
     plt.savefig("img\\imp_resp_example.png")
 
-    return test_room.mic_array.signals, mic_locs_rel
+    return test_room.mic_array.signals, mic_locs_rel, test_signal
 
 # print(np.shape(make_room_impulse_responses()))

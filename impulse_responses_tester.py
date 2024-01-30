@@ -16,7 +16,7 @@ def make_beamformer_test_room_impulse_responses():
 
     test_signal = np.random.random(int(fs*imp_length))-0.5
 
-    b, a = butter(5, [1200, 1300], fs=fs, btype='band')
+    b, a = butter(5, [900, 1000], fs=fs, btype='band')
     test_signal = lfilter(b, a, test_signal)
 
     test_window = tukey(int(fs*imp_length))
@@ -69,7 +69,6 @@ def make_beamformer_test_room_impulse_responses():
     test_room.add_source(outside_src_1, signal=test_signal)
     test_room.add_microphone_array(mic_locs_abs)
     test_room.set_ray_tracing(receiver_radius=0.05, n_rays=50000, energy_thres=1e-5)
-
     # mics = pra.Beamformer(mic_locs_abs, test_room.fs, N=1024, Lg=0.1)
     # test_room.add_microphone_array(mics)
     # mics.rake_delay_and_sum_weights(test_room.sources[0][:1])
@@ -101,6 +100,6 @@ def make_beamformer_test_room_impulse_responses():
     plt.grid(True, "both")
     plt.savefig("img_test_beamformer\\imp_resp_example.png")
 
-    return test_room.mic_array.signals, mic_locs_rel
+    return test_room.mic_array.signals, mic_locs_rel, test_room
 
 # print(np.shape(make_beamformer_test_room_impulse_responses()))
